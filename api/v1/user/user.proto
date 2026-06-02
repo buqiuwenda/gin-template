@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package api.v1.user;
+
+option go_package = "github.com/buqiuwenda/gin-template/api/gen/go/v1/user;userv1";
+
+// User 用户资源（契约 DTO，由 transport 层绑定 HTTP JSON）
+message User {
+  uint64 id = 1;
+  string username = 2;
+  string email = 3;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+}
+
+message CreateUserReply {
+  User user = 1;
+}
+
+message GetUserRequest {
+  uint64 id = 1;
+}
+
+message GetUserReply {
+  User user = 1;
+}
