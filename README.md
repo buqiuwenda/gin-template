@@ -1,6 +1,6 @@
 # gin-template
 
-基于 **Gin** 的 Web API 服务脚手架：使用 **Cobra** 启动、**Google Wire** 依赖注入、**Protobuf** 定义接口与参数，业务按分层架构组织。
+基于 **Gin** 的 Web API 服务脚手架：使用 **Cobra** 启动、**Google Wire** 依赖注入、**Protobuf** 定义接口与参数， **gorm** 数据层 业务按分层架构组织。
 
 ## 技术栈
 
@@ -11,6 +11,7 @@
 | 依赖注入 | [google/wire](https://github.com/google/wire) |
 | API 契约 | Protocol Buffers（`protoc` + `protoc-gen-go`） |
 | 配置 | YAML（`gopkg.in/yaml.v3`） |
+| ORM | [gorm.io/gorm](https://gorm.io) + MySQL 驱动 |
 
 ## 分层说明
 
@@ -26,9 +27,9 @@ transport (Gin Handler) → application (用例) → domain (实体/仓储接口
 | 入口层 | `cmd/` | Cobra 命令：`web` 启动 HTTP，`job` 后台任务 |
 | 传输层 | `internal/transport/http` | Gin 路由、绑定 JSON、调用 application |
 | 应用层 | `internal/application` | 用例编排，不含 HTTP/DB 细节 |
-| 领域层 | `internal/domain` | 实体、值对象、仓储 **interface** |
-| 基础设施层 | `internal/data` | 仓储实现、MySQL/Redis 等 |
-| 服务层 | `internal/server` | Gin Engine、路由注册、Server 生命周期 |
+| 领域层 | `internal/domain` | 按 `<biz>_domain` 划分：实体、领域服务、仓储接口 |
+| 基础设施层 | `internal/data` | GORM 连接、表模型（`models`）、仓储实现 |
+| 服务层 | `internal/server` | Gin Engine、路由注册、HTTP 启动与优雅退出 |
 | 横切 | `internal/middleware`、`internal/meta`、`internal/config` | 中间件、统一响应、配置 |
 
 ## 目录结构
@@ -53,13 +54,10 @@ gin-template/
 ├── configs/
 │   └── config.example.yaml           # 配置示例（复制为 config.yaml 使用）
 ├── internal/
-│   ├── app/                          # 应用组装与运行（Run / 优雅退出）
-│   │   ├── app.go
-│   │   └── provider.go
 │   ├── config/                       # 配置加载
 │   │   ├── config.go
 │   │   └── provider.go
-│   ├── server/                       # HTTP Server（Gin + 路由）
+│   ├── server/                       # HTTP Server（Gin + 路由 + Run/优雅退出）
 │   │   ├── http.go
 │   │   ├── router.go
 │   │   └── provider.go
@@ -69,14 +67,19 @@ gin-template/
 │   ├── application/                  # 应用层（用例 Service）
 │   │   ├── provider.go
 │   │   └── user/service.go
-│   ├── domain/                       # 领域层（实体 + 仓储接口）
-│   │   └── user/
-│   │       ├── user.go
-│   │       └── repository.go
-│   ├── data/                         # 基础设施（仓储实现、DB）
-│   │   ├── data.go
-│   │   ├── provider.go
-│   │   └── user/repo.go
+│   ├── domain/                       # 领域层（按业务域划分）
+│   │   └── user_domain/              # 用户领域
+│   │       ├── user_domain.go        # 领域服务（UserDomain）
+│   │       ├── provider.go           # Wire Provider
+│   │       ├── entity/
+│   │       │   └── user.go           # UserEntity
+│   │       └── repository/
+│   │           └── repo.go           # 仓储接口定义
+│   ├── data/                         # 基础设施（GORM、仓储实现）
+│   │   ├── data.go                   # GORM 连接初始化
+│   │   ├── provider.go               # Wire Provider（NewData / ProvideDB）
+│   │   ├── models/                   # GORM 表模型（与 domain 解耦）
+│   │   │   └── user.go               # UserModel
 │   ├── middleware/
 │   │   ├── jwt/jwt.go
 │   │   └── recovery/recovery.go
@@ -125,8 +128,8 @@ go run ./cmd web -c configs/config.example.yaml
 ## 扩展新业务
 
 1. 在 `api/v1/<biz>/` 增加 `.proto`，执行 `make proto`
-2. 在 `internal/domain/<biz>/` 定义实体与 `Repository` 接口
-3. 在 `internal/data/<biz>/` 实现仓储
+2. 在 `internal/domain/<biz>_domain/` 增加 `entity/`、`repository/` 与 `<biz>_domain.go` 领域服务
+3. 在 `internal/data/models/<biz>.go` 定义 GORM Model，在 `internal/domain/<biz>_domain/repository/` 实现仓储
 4. 在 `internal/application/<biz>/` 编写 Service
 5. 在 `internal/transport/http/v1/<biz>/` 编写 Handler 并注册路由
 6. 在对应 `provider.go` 加入 `wire.NewSet`，执行 `make wire`
@@ -135,9 +138,9 @@ go run ./cmd web -c configs/config.example.yaml
 
 注入入口：`cmd/web/wire.go` → 生成 `cmd/web/wire_gen.go`。
 
-Provider 分布在各层 `provider.go`，由 `InitializeApp` 一次性组装：
+Provider 分布在各层 `provider.go`，由 `InitializeHTTPServer` 一次性组装：
 
-`config` → `data` → `application` → `transport` → `server` → `app`
+`config` → `data` → `application` → `transport` → `server`
 
 ## License
 

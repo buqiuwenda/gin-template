@@ -4,7 +4,6 @@
 package web
 
 import (
-	"github.com/buqiuwenda/gin-template/internal/app"
 	"github.com/buqiuwenda/gin-template/internal/application"
 	"github.com/buqiuwenda/gin-template/internal/config"
 	"github.com/buqiuwenda/gin-template/internal/data"
@@ -13,14 +12,13 @@ import (
 	"github.com/google/wire"
 )
 
-func InitializeApp(configPath string) (*app.App, func(), error) {
+func InitializeHTTPServer(configPath string) (*server.HTTPServer, func(), error) {
 	wire.Build(
-		config.New,
 		data.ProviderSet,
 		application.ProviderSet,
+		domain.ProviderSet,
 		transporthttp.ProviderSet,
 		server.ProviderSet,
-		app.ProviderSet,
 	)
 	return nil, nil, nil
 }

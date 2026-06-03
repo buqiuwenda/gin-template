@@ -3,23 +3,24 @@ package user
 import (
 	"context"
 
-	domain "github.com/buqiuwenda/gin-template/internal/domain/user"
+	domain "github.com/buqiuwenda/gin-template/internal/domain/user_domain"
 )
 
 // Service 应用层用例，编排 domain 与仓储
 type Service struct {
-	repo domain.Repository
+	userDomain user_domain.UserDomain
+	ctx context.Context
 }
 
-func NewService(repo domain.Repository) *Service {
-	return &Service{repo: repo}
+func NewService(userDomain user_domain.UserDomain, ctx context.Context) *Service {
+	return &Service{userDomain: userDomain, ctx: ctx}
 }
 
 func (s *Service) CreateUser(ctx context.Context, username, email string) (*domain.User, error) {
 	u := &domain.User{Username: username, Email: email}
-	return s.repo.Create(ctx, u)
+	return s.userDomain.CreateUser(ctx, u)
 }
 
 func (s *Service) GetUser(ctx context.Context, id uint64) (*domain.User, error) {
-	return s.repo.GetByID(ctx, id)
+	return s.userDomain.GetUser(ctx, id)
 }

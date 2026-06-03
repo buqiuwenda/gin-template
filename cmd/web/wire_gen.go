@@ -7,27 +7,32 @@
 package web
 
 import (
-	"github.com/buqiuwenda/gin-template/internal/app"
-	user2 "github.com/buqiuwenda/gin-template/internal/application/user"
+	"github.com/buqiuwenda/gin-template/internal/application/user"
 	"github.com/buqiuwenda/gin-template/internal/config"
-	"github.com/buqiuwenda/gin-template/internal/data/user"
+	"github.com/buqiuwenda/gin-template/internal/data"
+	datauser "github.com/buqiuwenda/gin-template/internal/data/user"
 	"github.com/buqiuwenda/gin-template/internal/server"
-	user3 "github.com/buqiuwenda/gin-template/internal/transport/http/v1/user"
+	transportuser "github.com/buqiuwenda/gin-template/internal/transport/http/v1/user"
 )
 
 // Injectors from wire.go:
 
-func InitializeApp(configPath2 string) (*app.App, func(), error) {
+func InitializeHTTPServer(configPath2 string) (*server.HTTPServer, func(), error) {
 	configConfig, err := config.New(configPath2)
 	if err != nil {
 		return nil, nil, err
 	}
-	repository := user.NewRepository()
-	service := user2.NewService(repository)
-	handler := user3.NewHandler(service)
+	dataData, cleanup, err := data.NewData(configConfig)
+	if err != nil {
+		return nil, nil, err
+	}
+	db := data.ProvideDB(dataData)
+	repository := datauser.NewUserRepository(db)
+	service := user.NewService(repository)
+	handler := transportuser.NewHandler(service)
 	engine := server.NewRouter(configConfig, handler)
 	httpServer := server.NewHTTPServer(configConfig, engine)
-	appApp := app.New(httpServer)
-	return appApp, func() {
+	return httpServer, func() {
+		cleanup()
 	}, nil
 }

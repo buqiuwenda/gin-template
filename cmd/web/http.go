@@ -13,12 +13,12 @@ func NewCommand() *cobra.Command {
 		Use:   "web",
 		Short: "启动 HTTP API 服务（Gin）",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			application, cleanup, err := InitializeApp(configPath)
+			httpSrv, cleanup, err := InitializeHTTPServer(configPath)
 			if err != nil {
 				return err
 			}
 			defer cleanup()
-			return application.Run()
+			return httpSrv.Run()
 		},
 	}
 	cmd.Flags().StringVarP(&configPath, "config", "c", "configs/config.example.yaml", "配置文件路径")

@@ -46,6 +46,9 @@ func Load(path string) (*Config, error) {
 	if cfg.JWT.Expire == 0 {
 		cfg.JWT.Expire = 24 * time.Hour
 	}
+	if cfg.Data.Driver == "" {
+		cfg.Data.Driver = "mysql"
+	}
 	return &cfg, nil
 }
 
