@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"os"
@@ -13,13 +13,12 @@ var rootCmd = &cobra.Command{
 	Short: "Gin Web API 服务脚手架",
 }
 
-func init() {
-	rootCmd.AddCommand(web.NewCommand())
-	rootCmd.AddCommand(job.NewCommand())
-}
-
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+func init() {
+	rootCmd.AddCommand(web.NewCommand())
+	rootCmd.AddCommand(job.NewCommand())
 }

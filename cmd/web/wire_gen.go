@@ -7,32 +7,38 @@
 package web
 
 import (
+	"context"
 	"github.com/buqiuwenda/gin-template/internal/application/user"
-	"github.com/buqiuwenda/gin-template/internal/config"
-	"github.com/buqiuwenda/gin-template/internal/data"
-	datauser "github.com/buqiuwenda/gin-template/internal/data/user"
+	"github.com/buqiuwenda/gin-template/internal/conf"
+	"github.com/buqiuwenda/gin-template/internal/data/myclient"
+	"github.com/buqiuwenda/gin-template/internal/domain/user_domain"
+	"github.com/buqiuwenda/gin-template/internal/domain/user_domain/repository"
 	"github.com/buqiuwenda/gin-template/internal/server"
-	transportuser "github.com/buqiuwenda/gin-template/internal/transport/http/v1/user"
+	user2 "github.com/buqiuwenda/gin-template/internal/transport/http/v1/user"
 )
 
 // Injectors from wire.go:
 
-func InitializeHTTPServer(configPath2 string) (*server.HTTPServer, func(), error) {
-	configConfig, err := config.New(configPath2)
+func InitializeHTTPServer(bc2 *conf.Bootstrap) (*server.HTTPServer, func(), error) {
+	context := provideContext()
+	data := bc2.Data
+	engineGroup, cleanup, err := myclient.NewAigcMysqlClient(data)
 	if err != nil {
 		return nil, nil, err
 	}
-	dataData, cleanup, err := data.NewData(configConfig)
-	if err != nil {
-		return nil, nil, err
-	}
-	db := data.ProvideDB(dataData)
-	repository := datauser.NewUserRepository(db)
-	service := user.NewService(repository)
-	handler := transportuser.NewHandler(service)
-	engine := server.NewRouter(configConfig, handler)
-	httpServer := server.NewHTTPServer(configConfig, engine)
+	repo := repository.NewUserRepository(context, engineGroup)
+	userDomain := user_domain.NewUserDomain(repo, context)
+	service := user.NewService(userDomain, context)
+	handler := user2.NewHandler(service)
+	engine := server.NewRouter(bc2, handler)
+	httpServer := server.NewHTTPServer(bc2, engine)
 	return httpServer, func() {
 		cleanup()
 	}, nil
+}
+
+// wire.go:
+
+func provideContext() context.Context {
+	return context.Background()
 }

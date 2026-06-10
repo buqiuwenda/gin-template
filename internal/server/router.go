@@ -1,15 +1,15 @@
 package server
 
 import (
-	"github.com/buqiuwenda/gin-template/internal/config"
+	"github.com/buqiuwenda/gin-template/internal/conf"
 	"github.com/buqiuwenda/gin-template/internal/middleware/jwt"
 	"github.com/buqiuwenda/gin-template/internal/middleware/recovery"
 	transportuser "github.com/buqiuwenda/gin-template/internal/transport/http/v1/user"
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(cfg *config.Config, userHandler *transportuser.Handler) *gin.Engine {
-	gin.SetMode(cfg.Server.Mode)
+func NewRouter(cfg *conf.Bootstrap, userHandler *transportuser.Handler) *gin.Engine {
+	gin.SetMode(cfg.Server.Http.Mode)
 	r := gin.New()
 	r.Use(gin.Logger(), recovery.Recovery())
 

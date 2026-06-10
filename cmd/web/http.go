@@ -1,19 +1,29 @@
 package web
 
 import (
-	"log"
+	"github.com/buqiuwenda/seal/log"
 
+	"github.com/buqiuwenda/gin-template/internal/conf"
+	"github.com/buqiuwenda/gin-template/internal/pkg/xconfig"
 	"github.com/spf13/cobra"
 )
 
-var configPath string
+var bc *conf.Bootstrap
+
+func init() {
+	cfg, err := xconfig.InitConfig()
+	if err != nil {
+		log.Fatalf("Failed to init config: %v", err)
+	}
+	bc = &cfg
+}
 
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "web",
+		Use:   "http",
 		Short: "启动 HTTP API 服务（Gin）",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			httpSrv, cleanup, err := InitializeHTTPServer(configPath)
+			httpSrv, cleanup, err := InitializeHTTPServer(bc)
 			if err != nil {
 				return err
 			}
@@ -21,12 +31,5 @@ func NewCommand() *cobra.Command {
 			return httpSrv.Run()
 		},
 	}
-	cmd.Flags().StringVarP(&configPath, "config", "c", "configs/config.example.yaml", "配置文件路径")
 	return cmd
-}
-
-func init() {
-	cobra.OnInitialize(func() {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-	})
 }

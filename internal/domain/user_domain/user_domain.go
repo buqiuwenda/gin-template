@@ -1,25 +1,29 @@
 package user_domain
 
+import (
+	"context"
 
+	"github.com/buqiuwenda/gin-template/internal/domain/user_domain/entity"
+)
 
-type userRepository interface {
-	CreateUser(ctx context.Context, user *User) error
-	GetUser(ctx context.Context, id uint64) (*User, error)
+type UserRepository interface {
+	CreateUser(user *entity.UserEntity) error
+	GetUser(id uint64) (*entity.UserEntity, error)
 }
 
 type UserDomain struct {
-	repo userRepository
-	ctx context.Context
+	repo UserRepository
+	ctx  context.Context
 }
 
-func NewUserDomain(repo repository.UserRepository, ctx context.Context) *UserDomain {
+func NewUserDomain(repo UserRepository, ctx context.Context) *UserDomain {
 	return &UserDomain{repo: repo, ctx: ctx}
 }
 
-func (u *UserDomain) CreateUser(user *User) error {
-	return u.repo.CreateUser(u.ctx, user)
+func (u *UserDomain) CreateUser(user *entity.UserEntity) error {
+	return u.repo.CreateUser(user)
 }
 
-func (u *UserDomain) GetUser(id uint64) (*User, error) {
-	return u.repo.GetUser(u.ctx, id)
+func (u *UserDomain) GetUser(id uint64) (*entity.UserEntity, error) {
+	return u.repo.GetUser(id)
 }
