@@ -1,11 +1,26 @@
 server:
-  addr: ":8080"
-  mode: debug # debug | release | test
-
+  http:
+    addr: 0.0.0.0:8080
+    timeout: 10s
+    mode: debug
+  grpc:
+    addr: 0.0.0.0:9090
+    timeout: 30s
+    mode: debug
 data:
-  driver: mysql
-  source: "user:pass@tcp(127.0.0.1:3306)/gin_template?charset=utf8mb4&parseTime=True&loc=Local"
-
-jwt:
-  secret: "change-me"
-  expire: 24h
+  mysql:
+    wenda_aigc:
+      master:
+        dsn: "username:password@tcp(localhost:3306)/database?charset=utf8mb4&parseTime=true&loc=Local"
+      slaves:
+        - dsn: "username:password@tcp(localhost:3306)/database?charset=utf8mb4&parseTime=true&loc=Local"
+      is_debug: true
+      max_idle: 50
+      max_open: 20
+      max_lifetime: 600
+      ssl_enable: false
+      ca_file: ""
+      tls_name: ""
+  jwt:
+    secret: "change-me"
+    expire: 86400
