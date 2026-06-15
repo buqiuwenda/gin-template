@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	userv1 "github.com/buqiuwenda/gin-template/api/gen/go/v1/user"
+	userv1 "github.com/buqiuwenda/gin-template/api/v1/user"
 	appuser "github.com/buqiuwenda/gin-template/internal/application/user"
 	"github.com/buqiuwenda/gin-template/internal/meta"
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, meta.Fail(400, err.Error()))
 		return
 	}
-	u, err := h.svc.CreateUser(c.Request.Context(), req.Username, req.Email)
+	u, err := h.svc.CreateUser(c.Request.Context(), req.Username, req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, meta.Fail(500, err.Error()))
 		return

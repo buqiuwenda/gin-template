@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	domain "github.com/buqiuwenda/gin-template/internal/domain/user_domain"
 	"github.com/buqiuwenda/gin-template/internal/domain/user_domain/entity"
@@ -17,8 +18,15 @@ func NewService(userDomain *domain.UserDomain, ctx context.Context) *Service {
 	return &Service{userDomain: userDomain, ctx: ctx}
 }
 
-func (s *Service) CreateUser(ctx context.Context, username, email string) (*entity.UserEntity, error) {
-	u := &entity.UserEntity{Username: username, Email: email}
+func (s *Service) CreateUser(ctx context.Context, username, email, password string) (*entity.UserEntity, error) {
+	u := &entity.UserEntity{
+		Username:      username,
+		Email:         email,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+		Password:      password,
+		LastLoginTime: time.Now(),
+	}
 	err := s.userDomain.CreateUser(u)
 	if err != nil {
 		return nil, err

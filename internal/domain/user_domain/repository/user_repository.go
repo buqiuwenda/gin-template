@@ -7,6 +7,7 @@ import (
 	"github.com/buqiuwenda/gin-template/internal/data/models"
 	"github.com/buqiuwenda/gin-template/internal/domain/user_domain/entity"
 	"github.com/buqiuwenda/gin-template/internal/meta"
+	"github.com/buqiuwenda/gin-template/internal/utils"
 )
 
 type Repo struct {
@@ -25,7 +26,15 @@ func (r *Repo) CreateUser(u *entity.UserEntity) error {
 	if u == nil {
 		return errors.New("user is nil")
 	}
-	m := &models.UserModel{Username: u.Username, Email: u.Email}
+	m := &models.UserModel{
+		Nickname:      u.Username,
+		Email:         u.Email,
+		Password:      utils.Md5(u.Password),
+		Status:        u.Status,
+		LastLoginTime: u.LastLoginTime,
+		CreatedAt:     u.CreatedAt,
+		UpdatedAt:     u.UpdatedAt,
+	}
 	_, err := r.db.Table(m.TableName()).Insert(m)
 	if err != nil {
 		return err
@@ -52,7 +61,7 @@ func (r *Repo) GetUser(id uint64) (*entity.UserEntity, error) {
 func toDomain(m *models.UserModel) *entity.UserEntity {
 	return &entity.UserEntity{
 		ID:        m.ID,
-		Username:  m.Username,
+		Username:  m.Nickname,
 		Email:     m.Email,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
