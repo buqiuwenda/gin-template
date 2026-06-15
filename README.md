@@ -40,8 +40,6 @@ gin-template/
 │   ├── v1/
 │   │   └── user/
 │   │       └── user.proto            # 用户相关请求/响应定义
-│   └── gen/go/                       # protoc 生成代码（make proto）
-│       └── v1/user/user.pb.go
 ├── cmd/                              # 程序入口（Cobra）
 │   ├── main.go
 │   ├── root.go                       # 根命令
