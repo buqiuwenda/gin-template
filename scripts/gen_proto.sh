@@ -12,4 +12,4 @@ protoc \
   --go_out=. --go_opt=module=github.com/buqiuwenda/gin-template \
   api/v1/user/user.proto
 
-echo "proto generated under api/gen/go"
+echo "proto generated under api/gen"

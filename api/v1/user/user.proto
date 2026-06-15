@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.v1.user;
 
-option go_package = "github.com/buqiuwenda/gin-template/api/gen/go/v1/user;userv1";
+option go_package = "github.com/buqiuwenda/gin-template/api/v1/user;userv1";
 
 // User 用户资源（契约 DTO，由 transport 层绑定 HTTP JSON）
 message User {
