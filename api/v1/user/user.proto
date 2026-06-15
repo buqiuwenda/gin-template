@@ -6,13 +6,16 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/buqiuwenda/gin-template/api/v1/user;userv1";
 
+// UserService 用户
 service UserService {
+  // 添加用户
   rpc CreateUser(CreateUserRequest) returns (CreateUserReply) {
     option (google.api.http) = {
       post: "/api/v1/users"
       body: "*"
     };
   }
+  // 获取用户
   rpc GetUser(GetUserRequest) returns (GetUserReply) {
     option (google.api.http) = {
       get: "/api/v1/users/{id}"
@@ -20,6 +23,7 @@ service UserService {
   }
 }
 
+//  添加用户
 message CreateUserRequest {
   string username = 1;
   string email = 2;
@@ -29,7 +33,7 @@ message CreateUserRequest {
 message CreateUserReply {
   User user = 1;
 }
-
+// 获取用户 
 message GetUserRequest {
   uint64 id = 1;
 }
