@@ -38,3 +38,6 @@ configs/debug/*
 
 # proto 依赖（make proto 自动拉取）
 third_party/googleapis/
+
+# reverse 生成文件
+reverse.yaml
