@@ -26,11 +26,11 @@ func (r *Repo) CreateUser(u *entity.UserEntity) error {
 	if u == nil {
 		return errors.New("user is nil")
 	}
-	m := &models.UserModel{
+	m := &models.User{
 		Nickname:      u.Username,
 		Email:         u.Email,
 		Password:      utils.Md5(u.Password),
-		Status:        u.Status,
+		Status:        uint(u.Status),
 		LastLoginTime: u.LastLoginTime,
 		CreatedAt:     u.CreatedAt,
 		UpdatedAt:     u.UpdatedAt,
@@ -50,7 +50,7 @@ func (r *Repo) GetUser(id uint64) (*entity.UserEntity, error) {
 	if id == 0 {
 		return nil, errors.New("invalid id")
 	}
-	var m models.UserModel
+	var m models.User
 	_, err := r.db.Table(m.TableName()).Where("id = ?", id).Get(&m)
 	if err != nil {
 		return nil, err
@@ -58,12 +58,14 @@ func (r *Repo) GetUser(id uint64) (*entity.UserEntity, error) {
 	return toDomain(&m), nil
 }
 
-func toDomain(m *models.UserModel) *entity.UserEntity {
+func toDomain(m *models.User) *entity.UserEntity {
 	return &entity.UserEntity{
-		ID:        m.ID,
-		Username:  m.Nickname,
-		Email:     m.Email,
-		CreatedAt: m.CreatedAt,
-		UpdatedAt: m.UpdatedAt,
+		ID:            m.Id,
+		Username:      m.Nickname,
+		Email:         m.Email,
+		CreatedAt:     m.CreatedAt,
+		UpdatedAt:     m.UpdatedAt,
+		LastLoginTime: m.LastLoginTime,
+		Status:        uint8(m.Status),
 	}
 }

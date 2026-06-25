@@ -1,4 +1,4 @@
-.PHONY: build run wire proto tidy gen-config gen-doc
+.PHONY: build run wire proto tidy gen-config gen-doc gen-db
 
 APP_NAME := gin-template
 CONFIG   ?= configs/config.example.yaml
@@ -22,6 +22,9 @@ tidy:
 gen-config:
 	protoc --go_out=. --go_opt=module=github.com/buqiuwenda/gin-template --go-grpc_out=. --go-grpc_opt=module=github.com/buqiuwenda/gin-template internal/conf/conf.proto
 
+# 生成数据库模型
+gen-db:
+	@reverse -f reverse.yaml
 
 # 生成 swagger 文档（依赖 third_party/googleapis，由 make proto 拉取）
 GOOGLEAPIS := third_party/googleapis

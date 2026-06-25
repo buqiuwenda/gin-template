@@ -1,20 +1,22 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
-// UserModel XORM 持久化模型（与 domain.User 解耦）
-type UserModel struct {
-	ID            uint64    `xorm:"id" json:"id"`
-	Nickname      string    `xorm:"nickname" json:"nickname"`
-	Phone         string    `xorm:"phone" json:"phone"`
-	Email         string    `xorm:"email" json:"email"`
-	Password      string    `xorm:"password" json:"password"`
-	Status        uint8     `xorm:"status" json:"status"`
-	LastLoginTime time.Time `xorm:"last_login_time" json:"last_login_time"`
-	CreatedAt     time.Time `xorm:"created_at" json:"created_at"`
-	UpdatedAt     time.Time `xorm:"updated_at" json:"updated_at"`
+type User struct {
+	Id            uint64    `xorm:"not null pk autoincr UNSIGNED BIGINT"`
+	Nickname      string    `xorm:"not null comment('昵称') unique VARCHAR(100)"`
+	Phone         string    `xorm:"not null comment('手机号') unique VARCHAR(20)"`
+	Email         string    `xorm:"not null default '' comment('邮箱') VARCHAR(255)"`
+	Password      string    `xorm:"not null default '' comment('密码') VARCHAR(255)"`
+	Status        uint      `xorm:"not null default 2 comment('状态 1-启用 2-禁用') UNSIGNED TINYINT"`
+	LastLoginTime time.Time `xorm:"comment('最后登录时间') DATETIME"`
+	CreatedAt     time.Time `xorm:"not null default CURRENT_TIMESTAMP comment('创建时间') index DATETIME"`
+	UpdatedAt     time.Time `xorm:"not null default CURRENT_TIMESTAMP comment('更新时间') DATETIME"`
+	DeletedAt     time.Time `xorm:"comment('删除时间') DATETIME"`
 }
 
-func (*UserModel) TableName() string {
+func (*User) TableName() string {
 	return "user"
 }

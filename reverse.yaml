@@ -1,0 +1,10 @@
+kind: reverse
+name: mydb
+source:
+  database: mysql
+  conn_str: "username:password@tcp(localhost:3306)/database?charset=utf8mb4&parseTime=true&loc=Local"
+targets:
+  - type: codes
+    language: golang
+    output_dir: ./internal/data/models
+    multiple_files: true
